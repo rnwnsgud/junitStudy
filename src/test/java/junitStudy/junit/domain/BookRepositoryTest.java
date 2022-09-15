@@ -27,8 +27,8 @@ class BookRepositoryTest {
     //@BeforeAll 테스트 시작 전에 한번만 실행
     @BeforeEach // 각 테스트 시작 전에 한번씩 실행
     public void dataSetting() {
-        String title = "junit5";
-        String author = "구준형";
+        String title = "junit";
+        String author = "겟인데어";
         Book book = Book.builder()
                 .title(title)
                 .author(author)
@@ -60,7 +60,7 @@ class BookRepositoryTest {
     @Test
     void findBookList() {
         //given
-        String title = "junit5";
+        String title = "junit";
         //when
         List<Book> booksPS = bookRepository.findAll();
         //then
@@ -72,7 +72,7 @@ class BookRepositoryTest {
     @Test
     void findOneBook() {
         //given
-        String title = "junit5";
+        String title = "junit";
 
         //when
         Book bookPS = bookRepository.findById(1L).get();
@@ -96,5 +96,36 @@ class BookRepositoryTest {
     }
 
     // 5. 책 수정
+    @Test
+    @Sql("classpath:db/tableInit.sql")
+    void bookEdit() {
+        //given
+        Long id = 1L;
+        String title = "junit5";
+        String author = "구준형";
+        Book book = new Book(id, title, author);
+
+        //when
+
+//        bookRepository.findAll().stream()
+//                .forEach(book1 -> {
+//                    System.out.println("book1.id = " + book1.getId());
+//                    System.out.println("book1.title = " + book1.getTitle());
+//                    System.out.println("book1.author = " + book1.getAuthor());
+//                    System.out.println("=========================");
+//                });
+        Book bookPS = bookRepository.save(book);
+
+//        bookRepository.findAll().stream()
+//                .forEach(book1 -> {
+//                    System.out.println("book1.id = " + book1.getId());
+//                    System.out.println("book1.title = " + book1.getTitle());
+//                    System.out.println("book1.author = " + book1.getAuthor());
+//                    System.out.println("=========================");
+//                });
+
+        //then
+        assertThat(bookPS.getTitle()).isEqualTo(title);
+    }
 
 }
