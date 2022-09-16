@@ -2,6 +2,7 @@ package junitStudy.junit.service;
 
 import junitStudy.junit.domain.Book;
 import junitStudy.junit.domain.BookRepository;
+import junitStudy.junit.util.MailSender;
 import junitStudy.junit.web.dto.BookRespDto;
 import junitStudy.junit.web.dto.BookSaveReqDto;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -17,6 +19,7 @@ import java.util.stream.Collectors;
 public class BookService {
 
     private final BookRepository bookRepository;
+    private final MailSender mailSender;
 
     // 1. 책 등록
     // return 값을 Book으로 받게 되어 컨트롤러단까지 흘러 들어가면 안됨
@@ -26,6 +29,11 @@ public class BookService {
     public BookRespDto resisterBook(BookSaveReqDto dto) {
         Book book = dto.toEntity();
         Book bookPS = bookRepository.save(book);
+        if (bookPS != null) {
+            if (!mailSender.send()) {
+                throw new RuntimeException("메일이 전송되지 않았습니다.");
+            }
+        }
         return new BookRespDto().toDto(bookPS);
 
     }
@@ -34,13 +42,37 @@ public class BookService {
     public List<BookRespDto> checkBookList() {
         List<Book> books = bookRepository.findAll();
         return books.stream()
-                .map(new BookRespDto():: toDto)
+                .map(new BookRespDto()::toDto)
                 .collect(Collectors.toList());
     }
 
     // 3. 책 한건 보기
+    public BookRespDto checkOneBook(Long id) {
+        Optional<Book> bookOP = bookRepository.findById(id);
+        if (bookOP.isPresent()) {
+            return new BookRespDto().toDto(bookOP.get());
+        } else {
+            throw new RuntimeException("해당 아이디를 찾을 수 없습니다.");
+        }
+    }
 
     // 4. 책 삭제
+    // 컨트롤러에서 null 막을 거고, 없는 id가 들어오면 롤백할 필요가 없음
+    @Transactional(rollbackFor = RuntimeException.class)
+    public void deleteBook(Long id) {
+        bookRepository.deleteById(id);
+    }
 
-    // 5. 책 수정정
+    // 5. 책 수정
+    @Transactional(rollbackFor = RuntimeException.class)
+    public void editBook(Long id, BookSaveReqDto dto) {
+        Optional<Book> bookOP = bookRepository.findById(id);
+        if (bookOP.isPresent()) {
+            Book bookPS = bookOP.get();
+            bookPS.update(dto.getTitle(), dto.getAuthor());
+        } else {
+            throw new RuntimeException("해당 아이디를 찾을 수 없습니다.");
+        }
+
+    } // 메서드 종료시에 더티체킹(flush)로 update 된다.
 }
