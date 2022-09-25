@@ -2,7 +2,7 @@ package junitStudy.junit.util;
 
 import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 public class MailSenderStub implements MailSender{
 
     @Override

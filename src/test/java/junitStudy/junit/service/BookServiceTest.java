@@ -3,10 +3,9 @@ package junitStudy.junit.service;
 import junitStudy.junit.domain.Book;
 import junitStudy.junit.domain.BookRepository;
 import junitStudy.junit.util.MailSender;
-import junitStudy.junit.util.MailSenderStub;
-import junitStudy.junit.web.dto.BookRespDto;
-import junitStudy.junit.web.dto.BookSaveReqDto;
-import org.assertj.core.api.Assertions;
+import junitStudy.junit.web.dto.response.BookListRespDto;
+import junitStudy.junit.web.dto.response.BookRespDto;
+import junitStudy.junit.web.dto.request.BookSaveReqDto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -56,6 +55,7 @@ class BookServiceTest {
 
     }
 
+    //checktpoint
     @Test
     void viewBookList() {
 
@@ -68,16 +68,11 @@ class BookServiceTest {
         when(bookRepository.findAll()).thenReturn(books);
 
         //when
-        List<BookRespDto> dtoList = bookService.checkBookList();
+        BookListRespDto bookListRespDto = bookService.checkBookList();
         //print
-        dtoList.stream().forEach(dto -> {
-            System.out.println("====================== 테스트");
-            System.out.println("dto id= " + dto.getId());
-            System.out.println("dto title= " + dto.getTitle());
-        });
 
         //then
-        assertThat("junit강의").isEqualTo(dtoList.get(0).getTitle());
+        assertThat("junit강의").isEqualTo(bookListRespDto.getItems().get(0).getTitle());
     }
 
     @Test

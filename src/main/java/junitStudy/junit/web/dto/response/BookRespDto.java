@@ -1,4 +1,4 @@
-package junitStudy.junit.web.dto;
+package junitStudy.junit.web.dto.response;
 
 import junitStudy.junit.domain.Book;
 import lombok.Builder;

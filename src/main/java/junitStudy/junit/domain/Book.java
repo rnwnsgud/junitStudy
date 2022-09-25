@@ -1,6 +1,6 @@
 package junitStudy.junit.domain;
 
-import junitStudy.junit.web.dto.BookRespDto;
+import junitStudy.junit.web.dto.response.BookRespDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
